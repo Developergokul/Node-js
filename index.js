@@ -42,6 +42,37 @@ app.post("/api/users", (req, res)=>{
 
 });
 
+// Edit the user
+app.put("/api/user/:id", (req, res) => {
+    const id = Number(req.params.id);
+    const body = req.body;
+
+    // Find user
+    const user = users.find((user) => user.id == id);
+
+    if (!user) {
+        return res.status(404).json({ status: "User not found" });
+    }
+
+    // 👉 Update user data
+    // Object.assign(user, body);
+    // OR you can use:
+    user.first_name = body.first_name;
+    // user.age = body.age;
+
+    // 👉 Save updated data
+    fs.writeFile("./UserData.json", JSON.stringify(users), (err) => {
+        if (err) {
+            return res.status(500).json({ status: "Error writing file" });
+        }
+
+        return res.json({
+            status: "success",
+            updatedUser: user
+        });
+    });
+});
+
 //define server
 app.listen(PORT, ()=>console.log('SERVER STARTED', {PORT}));
 

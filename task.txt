@@ -7,4 +7,4 @@ GET / users / 2 - Get the user with id  2
 
 POST / users - Create new user
 
-PATCH / users /1 - Edit the user with ID 1
+PATCH / users /1 - Edit the user with ID 1 - Done
