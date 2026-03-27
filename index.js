@@ -16,6 +16,12 @@ const PORT = '8000';
 //Middlewear  - plugin
 app.use(express.urlencoded({extended: false}));
 
+//custom middlewear
+app.use((req, res, next)=>{
+    console.log("Hello i am meadlewear 1");
+    next();
+});
+
 //GET request for displaying users
 app.get("/users",(req, res)=>{
     return res.json(users);
@@ -69,6 +75,33 @@ app.put("/api/user/:id", (req, res) => {
         return res.json({
             status: "success",
             updatedUser: user
+        });
+    });
+});
+
+// Delete API
+app.delete("/api/user/:id", (req, res) => {
+    const id = Number(req.params.id);
+
+    // 👉 Find user index (NOT just user)
+    const userIndex = users.findIndex((user) => user.id == id);
+
+    if (userIndex === -1) {
+        return res.status(404).json({ status: "User not found" });
+    }
+
+    // 👉 Remove user from array
+    const deletedUser = users.splice(userIndex, 1);
+
+    // 👉 Save updated data to file
+    fs.writeFile("./UserData.json", JSON.stringify(users), (err) => {
+        if (err) {
+            return res.status(500).json({ status: "Error writing file" });
+        }
+
+        return res.json({
+            status: "success",
+            deletedUser: deletedUser[0]
         });
     });
 });
