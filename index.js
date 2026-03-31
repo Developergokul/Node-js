@@ -6,12 +6,34 @@ const fs = require('fs');
 
 // import dummy data file
 const users = require('./UserData.json');
+const { default: mongoose } = require('mongoose');
 
 //assign express to app variable
 const app = express();
 
 //assign port for server
 const PORT = '8000';
+
+//connection
+mongoose.connect("mongodb://127.0.0.1:27017");
+
+//Schema
+const userSchema = new mongoose.Schema({
+    first_name:{
+        type : String,
+        require : true
+    },
+    last_name:{
+        type : String
+    },
+    email:{
+        type : String,
+        require : true,
+        unique : true,
+    }
+});
+
+const usermodal = mongoose.model("users", userSchema);
 
 //Middlewear  - plugin
 app.use(express.urlencoded({extended: false}));
@@ -35,16 +57,24 @@ app.get("/user/:id",(req, res)=>{
 });
 
 //POST route to insert data
-app.post("/api/users", (req, res)=>{
+app.post("/api/users", async(req, res)=>{
     //request data from body
     const body = req.body;
 
     users.push({...body, id: users.length + 1 });
     //add data in file
-    fs.writeFile("./UserData.json", JSON.stringify(users), (err, data)=>{
+    // fs.writeFile("./UserData.json", JSON.stringify(users), (err, data)=>{
 
-        return res.json({status:"success", id:users.length + 1});
-    });
+    //     return res.json({status:"success", id:users.length + 1});
+    // });
+const result = await usermodal.create({
+    first_name:body.first_name,
+    last_name:body.last_name,
+    email:body.email
+})
+console.log(result);
+res.status(201).json({msg:'success'});
+
 
 });
 
