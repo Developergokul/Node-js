@@ -45,14 +45,27 @@ app.use((req, res, next)=>{
 });
 
 //GET request for displaying users
-app.get("/users",(req, res)=>{
-    return res.json(users);
+app.get("/users", async(req, res)=>{
+    // return res.json(users);
+    const allDbUsers = await usermodal.find({});
+
+    const html = `
+    <ul>
+    ${allDbUsers.map((user)=>`<li>${user.first_name}</li>`).join("")}
+    </ul>
+    `;
+
+    return res.send(html);
+
+
 });
 
 //Get Request for displaying single user using ID
-app.get("/user/:id",(req, res)=>{
-    const id = req.params.id;
-    const user = users.find((user)=>user.id==id);
+app.get("/user/:id",async (req, res)=>{
+    // const id = req.params.id;
+    const user = await usermodal.findById(req.params.id)
+    // const user = users.find((user)=>user.id==id);
+    if(!user) return res.status(404).json({error:"User Not Found"});
     return res.json(user);
 });
 
